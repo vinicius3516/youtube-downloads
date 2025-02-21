@@ -4,14 +4,18 @@ import re
 import subprocess
 from pytubefix import YouTube
 from pathlib import Path
+import shutil  # Para detectar o FFmpeg no sistema
 
 app = Flask(__name__)
 
 # Obtém o diretório de Downloads do usuário
 DOWNLOAD_DIR = str(Path.home() / "Downloads")
 
-# Caminho local do FFmpeg (deve estar na mesma pasta do script)
-FFMPEG_PATH = os.path.join(os.getcwd(), "bin", "ffmpeg.exe")
+# Detectar o caminho do FFmpeg automaticamente
+FFMPEG_PATH = shutil.which("ffmpeg")
+
+if not FFMPEG_PATH:
+    raise FileNotFoundError("Erro: FFmpeg não encontrado no sistema. Certifique-se de que ele está instalado e acessível no PATH.")
 
 # Função para sanitizar o nome do arquivo
 def sanitize_filename(name):
@@ -66,4 +70,4 @@ def download():
         return jsonify({"error": f"Erro: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
